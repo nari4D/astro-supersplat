@@ -1,6 +1,13 @@
 ---
-const content  = '/splats/my-scene/sog/meta.json';
-const settings = '/splats/my-scene/settings.json';
+/* Make sure Tailwind is loaded on this page */
+import '../styles/global.css';
+
+/* Update these if your folder name changes */
+const base = '/splats/my-scene';
+const content  = `${base}/sog/meta.json`;   // unbundled SOG
+const settings = `${base}/settings.json`;
+const poster   = `${base}/poster.jpg`;      // optional (leave as-is; viewer ignores if missing)
+const viewerSrc = `${base}/index.html?content=${content}&settings=${settings}&poster=${poster}&noui=1`;
 ---
 
 <html lang="en">
@@ -8,54 +15,95 @@ const settings = '/splats/my-scene/settings.json';
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>My 3DGS (SOG) Landing</title>
-    <style>
-      :root { --bg: #0b0b0b; --fg: #eaeaea; }
-      html, body { margin: 0; background: var(--bg); color: var(--fg);
-                   font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
-      .wrap { max-width: 1100px; margin: 0 auto; padding: 20px; }
-      header { padding: 8px 0 16px; border-bottom: 1px solid #222; margin-bottom: 16px; }
-      h1 { font-size: 20px; margin: 0; }
-      .hero { height: 72vh; border-radius: 14px; overflow: hidden; background: #000; }
-      iframe { width: 100%; height: 100%; border: 0; display: block; }
-      .row { margin-top: 18px; }
-      a.button { display:inline-block; padding:10px 14px; border:1px solid #333; border-radius:10px; color:var(--fg); text-decoration:none; }
-      a.button:hover { background:#111; }
-      footer { margin-top: 28px; padding-top: 16px; border-top: 1px solid #222; color:#888; font-size: 14px; }
-    </style>
   </head>
-  <body>
-    <div class="wrap">
-      <header>
-        <h1>My SOG Demo</h1>
+  <body class="m-0 bg-neutral-950 text-neutral-100 font-[system-ui] leading-relaxed">
+    <div class="max-w-[1100px] mx-auto p-5">
+      <header class="pb-4 mb-4 border-b border-neutral-800">
+        <h1 class="m-0 text-xl font-semibold">My SOG Demo</h1>
       </header>
 
-      <main>
-        <section class="hero">
+      <!-- HERO (viewer) -->
+      <section class="h-[72vh] rounded-[14px] overflow-hidden bg-black relative">
+        <div class="w-full h-full relative">
           <iframe
-            src={`/splats/my-scene/index.html?content=${content}&settings=${settings}&noui=1`}
+            id="sogFrame"
+            src={viewerSrc}
             allowfullscreen
-            loading="lazy">
-          </iframe>
-        </section>
+            loading="lazy"
+            class="w-full h-full border-0 block"
+          ></iframe>
 
-        <section class="row">
-          <p>This page embeds the exported SuperSplat viewer and loads the unbundled SOG (<code>meta.json</code>) for faster delivery.</p>
-          <p>
-            <a class="button"
-               href={`/splats/my-scene/index.html?content=${content}&settings=${settings}&noui=1`}
-               target="_blank" rel="noopener">
-              Open fullscreen
-            </a>
-          </p>
-          <p>
-    <a class="button" href="/viewer/my-scene">
-      Open fullscreen viewer →
-    </a>
-  </p>
-        </section>
+          <!-- Loading overlay -->
+          <div
+            id="loader"
+            class="absolute inset-0 z-10 flex items-end justify-center p-5 bg-gradient-to-t from-black/80 to-transparent transition-opacity duration-300"
+          >
+            <div class="relative w-[90%] max-w-[420px]">
+              <div class="h-2 w-full rounded-full border border-neutral-700 bg-neutral-800/80 shadow-[inset_0_0_0_1px_rgba(0,0,0,.2)] overflow-hidden">
+                <span class="block w-1/3 h-full animate-sogload bg-gradient-to-r from-violet-600 to-cyan-400"></span>
+              </div>
+              <div class="absolute -top-6 inset-x-0 text-center text-sm text-neutral-400">
+                Loading 3D…
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-      <footer>© 2025</footer>
-      </main>
+      <!-- CTA -->
+      <section class="mt-5 flex justify-center">
+        <a
+          href="/viewer/my-scene"
+          class="inline-flex items-center gap-2 px-5 py-3 text-lg font-extrabold text-white rounded-xl shadow-xl bg-gradient-to-tr from-violet-600 to-cyan-400 transition hover:brightness-110 hover:-translate-y-0.5"
+        >
+          Open fullscreen viewer →
+        </a>
+      </section>
+
+      <footer class="mt-7 pt-4 border-t border-neutral-800 text-center text-sm text-neutral-400">
+        © 2025
+      </footer>
     </div>
+
+    <!-- Hide loader when the viewer is ready -->
+    <script is:inline>
+      const frame  = document.getElementById('sogFrame');
+      const loader = document.getElementById('loader');
+      const MAX_WAIT = 12000; // ms
+      let hidden = false;
+
+      function hide() {
+        if (hidden) return; hidden = true;
+        loader.classList.add('opacity-0', 'pointer-events-none');
+        setTimeout(() => loader.remove(), 400);
+      }
+
+      function isViewerReady() {
+        try {
+          const doc = frame.contentDocument;
+          if (!doc) return false;
+          const canvas = doc.querySelector('canvas');
+          if (canvas) {
+            const w = canvas.clientWidth || canvas.width || 0;
+            const h = canvas.clientHeight || canvas.height || 0;
+            if (w >= 64 && h >= 64) return true;
+          }
+          const win = frame.contentWindow;
+          if (win && win.pc && win.pc.app) return true; // PlayCanvas detected
+        } catch {}
+        return false;
+      }
+
+      frame.addEventListener('load', () => {
+        const start = performance.now();
+        const t = setInterval(() => {
+          if (isViewerReady()) { clearInterval(t); setTimeout(hide, 200); }
+          else if (performance.now() - start > MAX_WAIT) { clearInterval(t); hide(); }
+        }, 150);
+      });
+
+      window.addEventListener('click', hide, { once: true });
+      setTimeout(hide, MAX_WAIT + 2000);
+    </script>
   </body>
 </html>
