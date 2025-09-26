@@ -1,0 +1,51 @@
+
+
+
+http://localhost:4321/splats/my-scene/index.html?content=/splats/my-scene/scene.compressed.ply&noui&poster=url&ministats
+
+
+Start the dev server:
+PS C:\dev\astro-supersplat> 
+npm run dev
+
+Ctrl+C
+
+splat-transform "C:\dev\astro-supersplat\public\splats\my-scene\scene.compressed.ply" -b 2 "C:\dev\astro-supersplat\public\splats\my-scene\scene.sog"
+
+http://localhost:4321/splats/my-scene/index.html?content=/splats/my-scene/scene.sog&noui
+
+
+Console error!!!
+index.js:82077 Uncaught (in promise) TypeError: First argument to DataView constructor must be an ArrayBuffer at new DataView (<anonymous>) at parseZipArchive (index.js:82077:20) at handleArrayBuffer (index.js:82155:21) at index.js:82233:9 at index.js:35865:9
+
+
+mkdir C:\dev\astro-supersplat\public\splats\my-scene\sog -Force
+splat-transform "C:\dev\astro-supersplat\public\splats\my-scene\scene.compressed.ply" -b 2 -w "C:\dev\astro-supersplat\public\splats\my-scene\sog\meta.json"
+
+http://localhost:4321/splats/my-scene/index.html?content=/splats/my-scene/sog/meta.json&settings=/splats/my-scene/settings.json&noui=1
+
+
+
+==
+code in src/, assets in public/ (especially big/static stuff like your 3DGS files).
+==
+
+Your live setup now uses:
+
+src/pages/index.astro → / (landing page with the iframe)
+
+public/splats/my-scene/... → static viewer + SOG assets
+
+
+================
+DEPLOY
+
+
+git config --global user.name "nari4d"
+git config --global user.email "64998863+nari4D@users.noreply.github.com"
+
+
+
+
+
+

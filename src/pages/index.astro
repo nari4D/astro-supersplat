@@ -1,0 +1,56 @@
+---
+const content  = '/splats/my-scene/sog/meta.json';
+const settings = '/splats/my-scene/settings.json';
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>My 3DGS (SOG) Landing</title>
+    <style>
+      :root { --bg: #0b0b0b; --fg: #eaeaea; }
+      html, body { margin: 0; background: var(--bg); color: var(--fg);
+                   font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+      .wrap { max-width: 1100px; margin: 0 auto; padding: 20px; }
+      header { padding: 8px 0 16px; border-bottom: 1px solid #222; margin-bottom: 16px; }
+      h1 { font-size: 20px; margin: 0; }
+      .hero { height: 72vh; border-radius: 14px; overflow: hidden; background: #000; }
+      iframe { width: 100%; height: 100%; border: 0; display: block; }
+      .row { margin-top: 18px; }
+      a.button { display:inline-block; padding:10px 14px; border:1px solid #333; border-radius:10px; color:var(--fg); text-decoration:none; }
+      a.button:hover { background:#111; }
+      footer { margin-top: 28px; padding-top: 16px; border-top: 1px solid #222; color:#888; font-size: 14px; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <h1>My SOG Demo</h1>
+      </header>
+
+      <main>
+        <section class="hero">
+          <iframe
+            src={`/splats/my-scene/index.html?content=${content}&settings=${settings}&noui=1`}
+            allowfullscreen
+            loading="lazy">
+          </iframe>
+        </section>
+
+        <section class="row">
+          <p>This page embeds the exported SuperSplat viewer and loads the unbundled SOG (<code>meta.json</code>) for faster delivery.</p>
+          <p>
+            <a class="button"
+               href={`/splats/my-scene/index.html?content=${content}&settings=${settings}&noui=1`}
+               target="_blank" rel="noopener">
+              Open fullscreen
+            </a>
+          </p>
+        </section>
+
+      <footer>© 2025</footer>
+      </main>
+    </div>
+  </body>
+</html>
