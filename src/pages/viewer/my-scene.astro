@@ -1,0 +1,21 @@
+---
+const content  = '/splats/my-scene/sog/meta.json';
+const settings = '/splats/my-scene/settings.json';
+---
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      html, body { margin: 0; height: 100%; background: #000; }
+      .frame { display: block; width: 100vw; height: 100vh; border: 0; }
+    </style>
+  </head>
+  <body>
+    <iframe
+      class="frame"
+      src={`/splats/my-scene/index.html?content=${content}&settings=${settings}&noui=1`}
+      allowfullscreen
+    ></iframe>
+  </body>
+</html>
